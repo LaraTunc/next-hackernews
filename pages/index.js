@@ -4,8 +4,9 @@ import Error from 'next/error';
 import Layout from '../components/Layout';
 import StoryList from '../components/StoryList';
 import Link from 'next/link';
+import React, { useEffect } from 'react';
 
-function Index({ stories }) {
+function Index({ stories, page }) {
 	if (stories.length === 0) {
 		return <Error statusCode={503} />;
 	}
@@ -18,22 +19,36 @@ function Index({ stories }) {
 			<StoryList stories={stories} />
 
 			<footer>
-				<Link href={`/?page=1`}>
-					<a>Click here</a>
+				<Link href={`/?page=${page + 1}`}>
+					<a>Next page ({Number(page) + 1})</a>
 				</Link>
 			</footer>
+
+			<style jsx>{`
+				footer {
+					padding: 1em;
+				}
+				footer a {
+					font-weight: bold;
+					color: black;
+					text-decoration: none;
+				}
+			`}</style>
 		</Layout>
 	);
 }
 
-export async function getStaticProps() {
+Index.getInitialProps = async ({ query }) => {
+	let page = query.page || 1;
 	let stories;
 
 	try {
-		const res = await fetch(`http://api.hackerwebapp.com/news?page=1`, {
+		const api = `http://api.hackerwebapp.com/news?page=${page}`;
+		const res = await fetch(api, {
 			headers: {
 				Accept: 'application/json, text/plain, */*',
 				'User-Agent': '*',
+				'Access-Control-Allow-Origin': '*',
 			},
 		});
 		stories = await res.json();
@@ -43,10 +58,9 @@ export async function getStaticProps() {
 	}
 
 	return {
-		props: {
-			stories,
-		},
+		stories,
+		page,
 	};
-}
+};
 
 export default Index;
