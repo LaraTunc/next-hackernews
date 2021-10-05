@@ -4,7 +4,7 @@ import Error from 'next/error';
 import Layout from '../components/Layout';
 import StoryList from '../components/StoryList';
 import Link from 'next/link';
-import React, { useEffect } from 'react';
+import React from 'react';
 
 function Index({ stories, page }) {
 	if (stories.length === 0) {
